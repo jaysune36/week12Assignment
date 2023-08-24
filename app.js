@@ -32,9 +32,9 @@ class CarsListAPI {
     })
   }
 
-  static updateCarsList(car) {
+  static updateCarsList(id, car) {
     return $.ajax({
-      url: this.url + `/${car._id}`,
+      url: this.url + `/${id}`,
       dataType: 'json',
       data: JSON.stringify(car),
       contentType: 'application/json',
@@ -84,23 +84,24 @@ class DOMManager {
   }
 
   static editCar(id) {
-    let carData;
-    let car = CarsListAPI.getCar(id)
-      .then(data => data);
-    let makeInputs = $(`
-    <td><input type="text" name="newCarMake" id="newCarMake" class="form-control" placeholder=${car.carMake}></td>
-    <td><input type="text" name="newCarModel" id="newCarModel" class="form-control" placeholder=${car.carModel}></td>
-    <td><input type="number" name="newCarYear" id="newCarYear" class="form-control" placeholder=${car.year}></td>
+    CarsListAPI.getCar(id)
+      .then(data => {
+let makeInputs = $(`
+    <td><input type="text" name="newCarMake" id="newCarMake${id}" class="form-control" placeholder=${data.carMake}></td>
+    <td><input type="text" name="newCarModel" id="newCarModel${id}" class="form-control" placeholder=${data.carModel}></td>
+    <td><input type="number" name="newCarYear" id="newCarYear${id}" class="form-control" placeholder=${data.year}></td>
     <td>
-    <button class="btn btn-info" id="saveBtn" onclick="DOMManager.saveInfo(${$('#newCarMake').val(),$('#newCarModel').val(),$('#newCarYear').val()}-id)">Save</button></td>
+    <button class="btn btn-info" id="saveBtn" onclick="DOMManager.saveInfo(${id})">Save</button></td>
     `);
     $(`.${id}`).empty();
     $(`.${id}`).prepend(makeInputs);
+      })
+    
   }
 
-  static saveInfo(make, model, year) {
-    CarsListAPI.updateCarsList(new Cars(make, model, year))
-      .then(this.createCarsTable());
+  static saveInfo(id) {
+    CarsListAPI.updateCarsList(id, new Cars($(`#newCarMake${id}`).val(), $(`#newCarModel${id}`).val(), $(`#newCarYear${id}`).val()))
+      .then(()=>this.createCarsTable());
   }
 
 }
@@ -113,18 +114,6 @@ submitBtn.on('click', ()=> {
   carYear.val('');
   }
 });
-
-// saveBtn.on('click', () => {
-//   const newMake = $('#newCarMake');
-//   const newModel = $('#newCarModel');
-//   const newYear = $('#newCarYear');
-//   if(newMake.val() !== '' && newModel.val() !== '' & newYear.val() !== '') {
-//     DOMManager.saveInfo(newMake.val(), newModel.val(), newYear.val());
-//   carMake.val('');
-//   carModel.val('');
-//   carYear.val('');
-//   }
-// })
 
 
 DOMManager.createCarsTable();
