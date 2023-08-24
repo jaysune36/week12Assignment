@@ -3,6 +3,7 @@ const submitBtn = $('#submitBtn');
 const carMake = $('#carMake');
 const carModel = $('#carModel');
 const carYear = $('#carYear');
+const saveBtn = $('#saveBtn')
 
 // Car Class accepts 3 arguments. Make and Model arguments are a string and Year is a number
 class Cars {
@@ -65,7 +66,7 @@ class DOMManager {
         <td>${car.year}</td>
         <td>
         <button class="btn btn-danger" onclick="DOMManager.deleteCar(${car.id}-id)">Delete</button>
-        <button class="btn btn-success" onclick="editCar(${car.id}-id)">Edit</button>
+        <button class="btn btn-success" onclick="DOMManager.editCar(${car.id}-id)">Edit</button>
         </td>
       </tr>
     `)
@@ -82,6 +83,26 @@ class DOMManager {
       .then(() => this.createCarsTable());
   }
 
+  static editCar(id) {
+    let carData;
+    let car = CarsListAPI.getCar(id)
+      .then(data => data);
+    let makeInputs = $(`
+    <td><input type="text" name="newCarMake" id="newCarMake" class="form-control" placeholder=${car.carMake}></td>
+    <td><input type="text" name="newCarModel" id="newCarModel" class="form-control" placeholder=${car.carModel}></td>
+    <td><input type="number" name="newCarYear" id="newCarYear" class="form-control" placeholder=${car.year}></td>
+    <td>
+    <button class="btn btn-info" id="saveBtn" onclick="DOMManager.saveInfo(${$('#newCarMake').val(),$('#newCarModel').val(),$('#newCarYear').val()}-id)">Save</button></td>
+    `);
+    $(`.${id}`).empty();
+    $(`.${id}`).prepend(makeInputs);
+  }
+
+  static saveInfo(make, model, year) {
+    CarsListAPI.updateCarsList(new Cars(make, model, year))
+      .then(this.createCarsTable());
+  }
+
 }
 
 submitBtn.on('click', ()=> {
@@ -91,8 +112,20 @@ submitBtn.on('click', ()=> {
   carModel.val('');
   carYear.val('');
   }
-  
-})
+});
+
+// saveBtn.on('click', () => {
+//   const newMake = $('#newCarMake');
+//   const newModel = $('#newCarModel');
+//   const newYear = $('#newCarYear');
+//   if(newMake.val() !== '' && newModel.val() !== '' & newYear.val() !== '') {
+//     DOMManager.saveInfo(newMake.val(), newModel.val(), newYear.val());
+//   carMake.val('');
+//   carModel.val('');
+//   carYear.val('');
+//   }
+// })
+
 
 DOMManager.createCarsTable();
 
