@@ -7,8 +7,8 @@ const carYear = $('#carYear');
 // Car Class accepts 3 arguments. Make and Model arguments are a string and Year is a number
 class Cars {
   constructor(make, model, year){
-    this.make = make;
-    this.model = model;
+    this.carMake = make;
+    this.carModel = model;
     this.year = year;
   }
 }
@@ -56,6 +56,7 @@ class DOMManager {
 
   static render(cars) {
     this.cars = cars;
+    $('tbody').empty();
     for(let car of cars ) {
       $('tbody').prepend(`
       <tr class="${car.id}">
@@ -71,7 +72,17 @@ class DOMManager {
     }
   }
 
+  static addCar(make, model, year) {
+    CarsListAPI.createCar(new Cars(make, model, year));
+    this.createCarsTable();
+  }
+
 }
+
+submitBtn.on('click', (e)=> {
+  // console.log(carMake.val() + carModel.val() + carYear.val())
+  DOMManager.addCar(carMake.val(), carModel.val(), carYear.val());
+})
 
 DOMManager.createCarsTable();
 
