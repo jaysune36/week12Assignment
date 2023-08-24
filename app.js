@@ -24,7 +24,7 @@ class CarsListAPI {
     return $.get(this.url + `/${id}`)
   }
 
-  static deleteCarsList(id) {
+  static deleteCarTb(id) {
     return $.ajax({
       url: this.url + `/${id}`,
       type: 'DELETE'
@@ -55,8 +55,8 @@ class DOMManager {
   }
 
   static render(cars) {
-    this.cars = cars;
     $('tbody').empty();
+    this.cars = cars;
     for(let car of cars ) {
       $('tbody').prepend(`
       <tr class="${car.id}">
@@ -64,7 +64,7 @@ class DOMManager {
         <td>${car.carModel}</td>
         <td>${car.year}</td>
         <td>
-        <button class="btn btn-danger" onclick="deleteCar(${car.id}-id)">Delete</button>
+        <button class="btn btn-danger" onclick="DOMManager.deleteCar(${car.id}-id)">Delete</button>
         <button class="btn btn-success" onclick="editCar(${car.id}-id)">Edit</button>
         </td>
       </tr>
@@ -73,15 +73,25 @@ class DOMManager {
   }
 
   static addCar(make, model, year) {
-    CarsListAPI.createCar(new Cars(make, model, year));
-    this.createCarsTable();
+    CarsListAPI.createCar(new Cars(make, model, year))
+      .then(this.createCarsTable());
+  }
+
+  static deleteCar(id) {
+    CarsListAPI.deleteCarTb(id)
+      .then(() => this.createCarsTable());
   }
 
 }
 
-submitBtn.on('click', (e)=> {
-  // console.log(carMake.val() + carModel.val() + carYear.val())
-  DOMManager.addCar(carMake.val(), carModel.val(), carYear.val());
+submitBtn.on('click', ()=> {
+  if(carMake.val() !== '' && carModel.val() !== '' & carYear.val() !== '') {
+    DOMManager.addCar(carMake.val(), carModel.val(), carYear.val());
+  carMake.val('');
+  carModel.val('');
+  carYear.val('');
+  }
+  
 })
 
 DOMManager.createCarsTable();
